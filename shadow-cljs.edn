@@ -1,0 +1,30 @@
+{:deps            true
+ :nrepl            {:port 8702}
+ :compiler-options {:infer-externs           :auto
+                    :output-feature-set      :es-next
+                    :source-map              true
+                    :source-map-detail-level :all
+                    :warnings                {:fn-deprecated false}}
+ :builds
+ {:plugin    {:target           :node-library
+              ;; :asset-path    ""
+              :output-dir       "cljs-out"
+              :output-to        "saber.js"
+              :exports          {:evalCljs   saber.core/eval-cljs
+                                 :nreplStart saber.nrepl/start-server+
+                                 :nreplStop  saber.nrepl/stop-server+
+                                 :loadFile   saber.core/load-file
+                                 :main       saber.core/main
+                                 ;; :nrepl saber.nrepl-server/start
+                                 }
+              :compiler-options {:optimizations :none
+                                 :externs       ["datascript/externs.js"]}
+              :modules          {:saber {:entries [saber.core]}}
+              ;; :build-hooks   [(portal.shadow.remote/hook)]
+              :devtools         {
+                                 ;; :preloads    [devtools.preload]
+                                 ;; :after-load  core/reload
+                                 :repl-pprint true
+                                 :watch-dir   "cljs-out"}
+              :release          {:compiler-options {:optimizations :simple}
+                                 :externs          "datascript/externs.js"}}}}

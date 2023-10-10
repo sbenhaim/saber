@@ -1,0 +1,20 @@
+{:paths ["src/main" "src/dev" "src/test"]
+
+ :deps    {funcool/promesa                   {:mvn/version "11.0.678"}
+           thheller/shadow-cljs              {:mvn/version "RELEASE"}
+           binaryage/devtools                {:mvn/version "1.0.7"}
+           applied-science/js-interop        {:mvn/version "0.4.2"}
+           tick/tick                         {:mvn/version "0.7.5"}
+           djblue/portal                     {:mvn/version "0.48.0"}
+           cider/cider-nrepl                 {:mvn/version "0.38.1"}
+           rewrite-clj/rewrite-clj           {:mvn/version "1.1.47"}
+           refactor-nrepl/refactor-nrepl     {:mvn/version "3.9.0"}
+           org.babashka/sci                  {:mvn/version "0.8.40"}
+           org.clojars.viesti/nrepl-cljs-sci {:mvn/version "0.0.13"}
+           ;; org.babashka/nbb              {:git/url "https://github.com/babashka/nbb"
+           ;;                                :git/sha "e125b9192a829b1c74005c7834eac69d9c6160e2"}
+           org.babashka/sci.configs          {:git/url "https://github.com/babashka/sci.configs"
+                                              :git/sha "5754193ac358b532f13ed0803f72711edd6c024c"}
+           datascript/datascript             {:mvn/version "1.5.3"}
+           reagent/reagent                   {:mvn/version "1.2.0"}}
+ :aliases {:dev {}}}

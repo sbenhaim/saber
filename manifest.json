@@ -1,0 +1,11 @@
+{
+	"id": "saber",
+	"name": "(Saber)",
+	"version": "0.0.1",
+	"minAppVersion": "0.15.0",
+	"description": "Rawr",
+	"author": "Selah",
+	"authorUrl": "https://github.com/sbenhaim",
+	"fundingUrl": "",
+	"isDesktopOnly": false
+}
