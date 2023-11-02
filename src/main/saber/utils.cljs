@@ -1,6 +1,5 @@
 (ns saber.utils
-  (:require ["fdir" :refer [fdir]]
-            [clojure.pprint :as pprint]
+  (:require [clojure.pprint :as pprint]
             [clojure.string :as str]
             [promesa.core :as p]))
 

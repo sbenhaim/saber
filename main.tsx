@@ -1,7 +1,10 @@
-import { Plugin, App, PluginSettingTab, Setting, Notice, MarkdownRenderer } from "obsidian";
-import { evalCljs, main } from "saber.js"
+import { Plugin, App, PluginSettingTab, Setting } from "obsidian";
+// import { main } from "cljs-out/saber.js";
 
-// Reload comment
+// window['SABER_DEV_MODE'] = true;
+window['obsidian']  = require('obsidian');
+
+// Reload comments
 
 
 interface SaberSettings {
@@ -25,20 +28,21 @@ export default class Saber extends Plugin {
 
     this.addSettingTab(new SaberSettingTab(this.app, this));
 
+    let { main } = await import("http://localhost:8605/saber.js");
+
     main(this);
 
-    this.registerMarkdownCodeBlockProcessor("clojure-eval", (source, el, ctx) => {
 
-      console.log(el.className);
+    // this.registerMarkdownCodeBlockProcessor("clojure-eval", (source, el, ctx) => {
 
-      let result:string = evalCljs(source);
-      let md:string = "```clojure\n" + result + "\n```\n\n";
-      MarkdownRenderer.renderMarkdown(md, el, "", ctx);
+    //   console.log(el.className);
 
-    });
+    //   let result:string = evalCljs(source);
+    //   let md:string = "```clojure\n" + result + "\n```\n\n";
+    //   MarkdownRenderer.renderMarkdown(md, el, "", ctx);
 
+    // });
 
-    // this.addCommand({"id": "repl", "name": "REPL", callback: () => {}});
 
     console.log('[:Saber :online]');
 

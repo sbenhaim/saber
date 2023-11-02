@@ -1,12 +1,13 @@
 (ns saber.core
-  (:require [saber.sci :refer [eval-string]]
-            [sci.core :as sci]
-            [saber.nrepl :as nrepl]
-            ["fs" :as fs]
-            [saber.obsidian :as obs]))
+  (:require
+   [promesa.core :as p]
+   [saber.nrepl :as nrepl]
+   [saber.obsidian :as obs :refer [js-obs]]
+   [saber.sci :refer [eval-string]]
+   [sci.core :as sci]))
 
-;; (set! *eval* #(sci/eval-form ctx %))
 
+(def obsidian (js-obs))
 
 (def eval-cljs eval-string)
 
@@ -14,22 +15,20 @@
   (eval-cljs "{:a :b}"))
 
 
-(defn load-file
+(defn load-cljs-file
   [path]
-  (let [source (fs/readFileSync path "utf8")]
-    (js/console.log source)
-    (sci/with-bindings
-      {sci/ns   @sci/ns
-       sci/file path}
-      (eval-string source))))
+  (sci/with-bindings
+    {sci/ns   @sci/ns
+     sci/file path}
+    (p/let [code (obs/read (obs/file path))]
+      (eval-string code))))
 
 
 (defn load-init
   []
-  (let [vault-root js/app.vault.adapter.basePath
-        init-script (str vault-root "/Saber/init.cljs")]
-    (if (fs/existsSync init-script)
-      (load-file init-script)
+  (let [path "Saber/init.cljs"]
+    (if-let [_ (obs/file path)]
+      (load-cljs-file path)
       (println "No init script found."))))
 
 
@@ -39,36 +38,36 @@
   (obs/msg (str "nREPL server started on port " port) 5000))
 
 
-#_(defn start-repl
-  [port]
-  (repl/connect (str "http://localhost:" port "/repl"))
-  (obs/msg (str "repl started on port " port)))
 
-
-
-;; (defn code-block-processor
-;;   [source el ctx]
-;;   (let [mode el.className
-;;         result (eval-string source)]
-;;     (case mode
-;;       "block-language-clojure-eval")))
+(defn code-block-processor
+  [source el ctx]
+  (let [mode el.className
+        result (eval-string source)]
+    (println mode)
+    (case mode
+      "block-language-clojure-eval" (obs/render-md
+                                      (str "```clojure\n" result "\n```")
+                                      el ctx)
+      "block-language-clojure-source" (obs/render-md
+                                        (str "```clojure\n"
+                                             source
+                                             "\n => "
+                                             result
+                                             "\n```")
+                                        el ctx))))
 
 
 (defn main
-  [plugin]
+  [^obsidian.Plugin plugin]
 
   ;; Command to start nREPL
   (obs/define-command
     :nrepl-server
     "Start nREPL server"
-    (fn [& _] (start-nrepl plugin.settings.nreplPort)))
+    #(start-nrepl plugin.settings.nreplPort))
 
   ;; Command to reload init file
   (obs/define-command :reload-init "Reload init.cljs" load-init)
-
-
-  #_(obs/define-command :start-repl "Start REPL" (fn [& _] (start-repl plugin.settings.replPort)))
-
 
   ;; Attempt to load init file
   (try
@@ -78,8 +77,10 @@
       (println "Error loading init.cljs: " e)))
 
   ;; Register markdown processors
-  ;; (.registerMarkdownCodeBlockProcessor plugin
-  ;;                                      "clojure"
-  ;;                                      code-block-procecssor)
+  (obs/cb-processor "clojure-eval" code-block-processor)
+  (obs/cb-processor "clojure-source" code-block-processor))
 
-  (obs/msg "(Saber online)" 2000))
+
+(comment
+  (obs/read
+    (obs/file "Saber/init.cljs")))

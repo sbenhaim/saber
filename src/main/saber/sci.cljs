@@ -3,7 +3,6 @@
    ["fs" :as fs]
    ["module" :as module]
    ["path" :as path]
-   ["obsidian" :as obsidian]
    [clojure.string :as str]
    [clojure.zip]
    [portal.api]
@@ -17,9 +16,10 @@
    [sci.configs.reagent.reagent :as reagent-config]
    [sci.core :as sci]
    [sci.ctx-store :as store]
-   [rewrite-clj.node]
-   [rewrite-clj.parser]
-   [rewrite-clj.zip]))
+   ;; [rewrite-clj.node]
+   ;; [rewrite-clj.parser]
+   ;; [rewrite-clj.zip]
+   ))
 
 (sci/enable-unrestricted-access!) ;; allows mutating and set!-ing all vars from inside SCI
 (sci/alter-var-root sci/print-fn (constantly *print-fn*))
@@ -68,14 +68,14 @@
 (def zip-namespace
   (sci/copy-ns clojure.zip zns))
 
-(def rzns (sci/create-ns 'rewrite-clj.zip))
-(def rewrite-clj-zip-ns (sci/copy-ns rewrite-clj.zip rzns))
+;; (def rzns (sci/create-ns 'rewrite-clj.zip))
+;; (def rewrite-clj-zip-ns (sci/copy-ns rewrite-clj.zip rzns))
 
-(def rpns (sci/create-ns 'rewrite-clj.parser))
-(def rewrite-clj-parser-ns (sci/copy-ns rewrite-clj.parser rpns))
+;; (def rpns (sci/create-ns 'rewrite-clj.parser))
+;; (def rewrite-clj-parser-ns (sci/copy-ns rewrite-clj.parser rpns))
 
-(def rnns (sci/create-ns 'rewrite-clj.node))
-(def rewrite-clj-node-ns (sci/copy-ns rewrite-clj.node rnns))
+;; (def rnns (sci/create-ns 'rewrite-clj.node))
+;; (def rewrite-clj-node-ns (sci/copy-ns rewrite-clj.node rnns))
 
 (def core-namespace (sci/create-ns 'clojure.core nil))
 
@@ -93,28 +93,27 @@
    'js-properties repl-utils/instance-properties})
 
 
-
-(store/reset-ctx!
-  (let [config {:classes {'js (doto goog/global
-                                (aset "require" js/require))
-                          :allow :all}
-                :namespaces {'clojure.core {'IFn (sci/copy-var IFn core-namespace)}
-                             'clojure.zip zip-namespace
-                             'saber.core saber-core
-                             'rewrite-clj.zip rewrite-clj-zip-ns
-                             'rewrite-clj.parser rewrite-clj-parser-ns
-                             'rewrite-clj.node rewrite-clj-node-ns
-                             'portal.api portal-namespace
+(defn get-ctx
+  []
+  (let [config {:classes    {'js    (doto goog/global
+                                   (aset "require" js/require))
+                             :allow :all}
+                :namespaces {'clojure.core   {'IFn (sci/copy-var IFn core-namespace)}
+                             'clojure.zip    zip-namespace
+                             'saber.core     saber-core
+                             ;; 'rewrite-clj.zip rewrite-clj-zip-ns
+                             ;; 'rewrite-clj.parser rewrite-clj-parser-ns
+                             ;; 'rewrite-clj.node rewrite-clj-node-ns
+                             'portal.api     portal-namespace
                              'saber.obsidian saber-obsidian-namespace}
                 :ns-aliases {'clojure.test 'cljs.test}
-                :js-libs {"fs" fs
-                          "obsidian" obsidian}
-                :load-fn (fn [{:keys [ns libname opts]}]
+                :js-libs    {"fs" fs}
+                :load-fn    (fn [{:keys [ns libname opts]}]
                            (cond
                              (symbol? libname)
                              (source-script-by-ns libname)
                              :else ;; (string? libname) ;; node built-in or npm library
-                             (let [mod (require* ns libname opts)
+                             (let [mod    (require* ns libname opts)
                                    ns-sym (symbol libname)]
                                (sci/add-class! (store/get-ctx) ns-sym mod)
                                (sci/add-import! (store/get-ctx) ns ns-sym
@@ -123,12 +122,17 @@
                                {:handled true})))}]
     (doto
         (sci/init config)
-        (sci/merge-opts js-interop-config/config)
-        (sci/merge-opts cljs-test-config/config)
-        (sci/merge-opts cljs-pprint-config/config)
-        (sci/merge-opts promesa-config/config)
-        (sci/merge-opts datascript-config/config)
-        (sci/merge-opts reagent-config/config))))
+      (sci/merge-opts js-interop-config/config)
+      (sci/merge-opts cljs-test-config/config)
+      (sci/merge-opts cljs-pprint-config/config)
+      (sci/merge-opts promesa-config/config)
+      (sci/merge-opts datascript-config/config)
+      (sci/merge-opts reagent-config/config))))
+
+
+(store/reset-ctx!
+  (get-ctx))
+
 
 (def !last-ns (volatile! @sci/ns))
 

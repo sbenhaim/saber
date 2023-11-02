@@ -1,4 +1,9 @@
-{:deps            true
+{:deps            {:aliases [:cljs]}
+ :dev-http         {8605 {:root "cljs-out"
+                          :push-state/headers {"content-type" "text/html; charset=utf-8"
+                                               "Access-Control-Allow-Origin" "*"}}}
+ :http             {:host "127.0.0.1"
+                    :port 9630}
  :nrepl            {:port 8702}
  :compiler-options {:infer-externs           :auto
                     :output-feature-set      :es-next
@@ -6,24 +11,26 @@
                     :source-map-detail-level :all
                     :warnings                {:fn-deprecated false}}
  :builds
- {:plugin    {:target           :node-library
-              ;; :asset-path    ""
+ {:plugin    {
+              ;; :target :node-library
+              ;; :exports {:main saber.core/main}
+
+
+              :target           :esm
+              :js-options       {:keep-native-requires true
+                                 :keep-as-require #{"obsidian"}}
+              :modules          {:saber {:exports {main saber.core/main}}}
+
               :output-dir       "cljs-out"
-              :output-to        "saber.js"
-              :exports          {:evalCljs   saber.core/eval-cljs
-                                 :nreplStart saber.nrepl/start-server+
-                                 :nreplStop  saber.nrepl/stop-server+
-                                 :loadFile   saber.core/load-file
-                                 :main       saber.core/main
-                                 ;; :nrepl saber.nrepl-server/start
-                                 }
+              :output-to        "cljs-out/saber.js"
+
               :compiler-options {:optimizations :none
                                  :externs       ["datascript/externs.js"]}
-              :modules          {:saber {:entries [saber.core]}}
               ;; :build-hooks   [(portal.shadow.remote/hook)]
               :devtools         {
                                  ;; :preloads    [devtools.preload]
                                  ;; :after-load  core/reload
+                                 :use-document-host false
                                  :repl-pprint true
                                  :watch-dir   "cljs-out"}
               :release          {:compiler-options {:optimizations :simple}

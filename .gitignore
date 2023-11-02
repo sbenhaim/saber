@@ -33,3 +33,4 @@ data.json
 /.npmrc
 /saber.js
 /main.example.ts
+/.rebel_readline_history
