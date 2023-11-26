@@ -6,6 +6,7 @@
    [clojure.string :as str]
    [clojure.zip]
    [portal.api]
+   [saber.dataview]
    [saber.repl-utils :as repl-utils]
    [saber.obsidian]
    [sci.configs.cljs.test :as cljs-test-config]
@@ -16,6 +17,10 @@
    [sci.configs.reagent.reagent :as reagent-config]
    [sci.core :as sci]
    [sci.ctx-store :as store]
+
+   [tick.core]
+   [tick.locale-en-us]
+
    ;; [rewrite-clj.node]
    ;; [rewrite-clj.parser]
    ;; [rewrite-clj.zip]
@@ -78,12 +83,12 @@
 ;; (def rewrite-clj-node-ns (sci/copy-ns rewrite-clj.node rnns))
 
 (def core-namespace (sci/create-ns 'clojure.core nil))
+(def portal-namespace (sci/copy-ns portal.api (sci/create-ns 'portal.api)))
+(def saber-obsidian-namespace (sci/copy-ns saber.obsidian (sci/create-ns 'saber.obsidian)))
+(def tick-core-namespace (sci/copy-ns tick.core (sci/create-ns 'tick.core)))
+(def tick-en-namespace (sci/copy-ns tick.locale-en-us (sci/create-ns 'tick.locale-en-us)))
+(def saber-dataview-namespace (sci/copy-ns saber.dataview (sci/create-ns 'saber.dataview)))
 
-(def pns (sci/create-ns 'portal.api))
-(def portal-namespace (sci/copy-ns portal.api pns))
-
-(def sons (sci/create-ns 'saber.obsidian))
-(def saber-obsidian-namespace (sci/copy-ns saber.obsidian sons))
 
 (def saber-core
   {'*file* sci/file
@@ -101,11 +106,17 @@
                 :namespaces {'clojure.core   {'IFn (sci/copy-var IFn core-namespace)}
                              'clojure.zip    zip-namespace
                              'saber.core     saber-core
+                             'portal.api     portal-namespace
+                             'saber.obsidian saber-obsidian-namespace
+                             'tick.core      tick-core-namespace
+                             'tick.locale-en-us tick-en-namespace
+                             'saber.dataview saber-dataview-namespace
+
                              ;; 'rewrite-clj.zip rewrite-clj-zip-ns
                              ;; 'rewrite-clj.parser rewrite-clj-parser-ns
                              ;; 'rewrite-clj.node rewrite-clj-node-ns
-                             'portal.api     portal-namespace
-                             'saber.obsidian saber-obsidian-namespace}
+
+                             }
                 :ns-aliases {'clojure.test 'cljs.test}
                 :js-libs    {"fs" fs}
                 :load-fn    (fn [{:keys [ns libname opts]}]

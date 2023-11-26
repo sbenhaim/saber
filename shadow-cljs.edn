@@ -1,5 +1,5 @@
-{:deps            {:aliases [:cljs]}
- :dev-http         {8605 {:root "cljs-out"
+{:deps            {:aliases [:cljs :portal-dev]}
+ :dev-http         {8605 {:root               "cljs-out"
                           :push-state/headers {"content-type" "text/html; charset=utf-8"
                                                "Access-Control-Allow-Origin" "*"}}}
  :http             {:host "127.0.0.1"

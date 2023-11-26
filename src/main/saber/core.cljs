@@ -3,16 +3,12 @@
    [promesa.core :as p]
    [saber.nrepl :as nrepl]
    [saber.obsidian :as obs :refer [js-obs]]
+   [saber.dataview :as dv]
    [saber.sci :refer [eval-string]]
    [sci.core :as sci]))
 
 
 (def obsidian (js-obs))
-
-(def eval-cljs eval-string)
-
-(comment
-  (eval-cljs "{:a :b}"))
 
 
 (defn load-cljs-file
@@ -21,15 +17,22 @@
     {sci/ns   @sci/ns
      sci/file path}
     (p/let [code (obs/read (obs/file path))]
-      (eval-string code))))
+      (try
+        (js/console.log "Code: " code)
+        (eval-string code)
+        (catch js/Error e
+          (obs/msg (str "Error loading " path ": " e))
+          (println "Error loading " path ": " e))))))
+
+(comment (obs/file "Saber/init.cljs"))
+
 
 
 (defn load-init
   []
   (let [path "Saber/init.cljs"]
-    (if-let [_ (obs/file path)]
-      (load-cljs-file path)
-      (println "No init script found."))))
+    (load-cljs-file path)
+    (println "Saber/init.cljs loaded.")))
 
 
 (defn start-nrepl
@@ -41,24 +44,30 @@
 
 (defn code-block-processor
   [source el ctx]
-  (let [mode el.className
-        result (eval-string source)]
-    (println mode)
-    (case mode
-      "block-language-clojure-eval" (obs/render-md
-                                      (str "```clojure\n" result "\n```")
-                                      el ctx)
-      "block-language-clojure-source" (obs/render-md
-                                        (str "```clojure\n"
-                                             source
-                                             "\n => "
-                                             result
-                                             "\n```")
-                                        el ctx))))
+  (try
+    (let [mode el.className
+          result (pr-str (eval-string source))]
+      (println mode)
+      (case mode
+        "block-language-clojure-eval" (obs/render-md
+                                        (str "```clojure\n" result "\n```")
+                                        el ctx)
+        "block-language-clojure-source" (obs/render-md
+                                          (str "```clojure\n"
+                                               source
+                                               "\n => "
+                                               result
+                                               "\n```")
+                                          el ctx)))
+    (catch js/Error e
+      (obs/msg (str "Error evaluating code block: " e))
+      (println "Error evaluating code block: " e))))
 
 
 (defn main
   [^obsidian.Plugin plugin]
+
+  (dv/init)
 
   ;; Command to start nREPL
   (obs/define-command
@@ -68,6 +77,9 @@
 
   ;; Command to reload init file
   (obs/define-command :reload-init "Reload init.cljs" load-init)
+
+  (js/console.log (obs/file "Saber/init.cljs"))
+  (js/console.log (js/app.vault.getAbstractFileByPath "Saber/init.cljs"))
 
   ;; Attempt to load init file
   (try

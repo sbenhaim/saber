@@ -3,6 +3,8 @@
             [applied-science.js-interop :as j]))
 
 
+
+
 (defn js-obs
   "In dev mode, we set a global obsidian variable. In release, we can require it."
   []
@@ -26,32 +28,46 @@
 (defn cursor []
   (.getCursor (editor)))
 
+
+(defn set-cursor
+  [c]
+  (.setCursor (editor) c))
+
 (comment (cursor))
 
-(defn current-line []
+(defn current-line-no []
   (j/get (cursor) :line))
+
+(comment (current-line-no))
+
+(defn current-line []
+  (.getLine (editor) (current-line-no)))
 
 (comment (current-line))
 
-(defn current-line-text []
-  (let [s (.getLine (editor) (current-line))]
-    (when-not (= s "") s)))
-
-(comment (current-line-text))
-
 (defn selection []
-  (let [s (.getSelection (editor))]
-    (when-not (= s "") s)))
+  (.getSelection (editor)))
+
+
+(defn alt-when=
+  [c i a]
+  (if (= i c) a c))
+
+
+(defn selection-or-current-line
+  []
+  (let [s (selection)]
+    (alt-when= s "" (current-line))))
 
 (comment (selection))
 
 
-(defn current-text []
+#_(defn current-text []
   (.. (editor) -cm -state -doc toString))
 
 
-(defn current-context []
-  (or (selection) (current-line-text) (current-text)))
+#_(defn current-context []
+  (or (selection) (current-line) (current-text)))
 
 
 ;; (comment (current-context))
@@ -85,14 +101,22 @@
 
 (defn replace-current-line
   [f]
-  (.setLine (editor) (current-line) (f (current-line-text))))
+  (.setLine (editor) (current-line-no) (f (current-line))))
 
 
-;; TODO: Use replace-current-line
-(defn replace-regexp-current-line [regexp replacement]
-  (let [txt (current-line-text)
+(defn replace-selection-or-line
+  [f]
+  (let [selection (selection)]
+    (if (= selection "")
+      (replace-current-line f)
+      (replace-selection f))))
+
+
+;; TODO: Use replace-current-line-no
+(defn replace-regexp-current-line-no [regexp replacement]
+  (let [txt (current-line)
         rep (s/replace txt regexp replacement)]
-    (.setLine (editor) (current-line) rep)))
+    (.setLine (editor) (current-line-no) rep)))
 
 
 (defn insert [text]
@@ -125,7 +149,7 @@
 
 
 (comment
-  (replace-regexp-current-line #"[aeiou]" "x"))
+  (replace-regexp-current-line-no #"[aeiou]" "x"))
 
 
 (defn cb-processor
@@ -149,7 +173,7 @@
 
 (comment (current-path))
 
-(comment (current-line-text))
+(comment (current-line))
 
 (defn current-word
   []
@@ -165,7 +189,7 @@
 
 (defn current-link
   []
-  (let [line (current-line-text)
+  (let [line (current-line)
         links (re-seq #"\[\[(.+?)\]\]" line)]
     (-> links first second)))
 
