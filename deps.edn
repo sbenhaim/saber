@@ -9,8 +9,9 @@
            reagent/reagent                   {:mvn/version "1.2.0"}
            babashka/babashka.nrepl {:mvn/version "0.0.7"}
            babashka/sci-configs {:git/url "https://github.com/babashka/sci-configs"
-                                 :git/sha "91c8eb918c80edaa0c1440070023a05b662538aa"}}
- :aliases {:cljs {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.25.9"}
+                                 :git/sha "91c8eb918c80edaa0c1440070023a05b662538aa"}
+           instaparse/instaparse {:mvn/version "1.4.12"}}
+ :aliases {:cljs {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.26.2"}
                                binaryage/devtools              {:mvn/version "1.0.7"}
                                cider/cider-nrepl               {:mvn/version "0.43.3"}
                                refactor-nrepl/refactor-nrepl   {:mvn/version "3.9.0"}

@@ -1,6 +1,7 @@
 (ns saber.core
   (:require
    [promesa.core :as p]
+   [saber.calcula :as calc]
    [saber.nrepl :as nrepl]
    [saber.obsidian :as obs :refer [js-obs]]
    [saber.dataview :as dv]
@@ -64,6 +65,14 @@
       (println "Error evaluating code block: " e))))
 
 
+(defn calcula-processor
+  [source el ctx]
+  (let [result (calc/process source)]
+    (obs/render-md
+      result
+      el ctx)))
+
+
 (defn main
   [^obsidian.Plugin plugin]
 
@@ -90,7 +99,10 @@
 
   ;; Register markdown processors
   (obs/cb-processor "clojure-eval" code-block-processor)
-  (obs/cb-processor "clojure-source" code-block-processor))
+  (obs/cb-processor "clojure-source" code-block-processor)
+
+  (obs/cb-processor "calcula" calcula-processor)
+  )
 
 
 (comment

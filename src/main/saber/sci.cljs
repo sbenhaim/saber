@@ -20,6 +20,7 @@
 
    [tick.core]
    [tick.locale-en-us]
+   ["@mui/x-data-grid" :as datagrid]
 
    ;; [rewrite-clj.node]
    ;; [rewrite-clj.parser]
@@ -88,6 +89,7 @@
 (def tick-core-namespace (sci/copy-ns tick.core (sci/create-ns 'tick.core)))
 (def tick-en-namespace (sci/copy-ns tick.locale-en-us (sci/create-ns 'tick.locale-en-us)))
 (def saber-dataview-namespace (sci/copy-ns saber.dataview (sci/create-ns 'saber.dataview)))
+(def datagrid-namespace (sci/copy-ns datagrid (sci/create-ns 'datagrid)))
 
 
 (def saber-core
@@ -111,6 +113,7 @@
                              'tick.core      tick-core-namespace
                              'tick.locale-en-us tick-en-namespace
                              'saber.dataview saber-dataview-namespace
+                             'datagrid datagrid-namespace
 
                              ;; 'rewrite-clj.zip rewrite-clj-zip-ns
                              ;; 'rewrite-clj.parser rewrite-clj-parser-ns
