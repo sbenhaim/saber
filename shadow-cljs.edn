@@ -1,4 +1,4 @@
-{:deps            {:aliases [:cljs :portal-dev]}
+{:deps            {:aliases [:cljs :dev-utils :guardrails]}
  :dev-http         {8605 {:root               "cljs-out"
                           :push-state/headers {"content-type" "text/html; charset=utf-8"
                                                "Access-Control-Allow-Origin" "*"}}}

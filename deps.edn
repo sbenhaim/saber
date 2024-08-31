@@ -1,16 +1,21 @@
 {:paths ["src/main" "src/dev" "src/test" "target"]
 
- :deps    {funcool/promesa                   {:mvn/version "11.0.678"}
-           applied-science/js-interop        {:mvn/version "0.4.2"}
-           tick/tick                         {:mvn/version "0.7.5"}
-           djblue/portal                     {:mvn/version "0.49.1"}
-           org.babashka/sci                  {:mvn/version "0.8.40"}
-           datascript/datascript             {:mvn/version "1.5.4"}
-           reagent/reagent                   {:mvn/version "1.2.0"}
-           babashka/babashka.nrepl {:mvn/version "0.0.7"}
-           babashka/sci-configs {:git/url "https://github.com/babashka/sci-configs"
-                                 :git/sha "91c8eb918c80edaa0c1440070023a05b662538aa"}
-           instaparse/instaparse {:mvn/version "1.4.12"}}
+ :deps    {funcool/promesa            {:mvn/version "11.0.678"}
+           applied-science/js-interop {:mvn/version "0.4.2"}
+           tick/tick                  {:mvn/version "0.7.5"}
+           djblue/portal              {:mvn/version "0.49.1"}
+           org.babashka/sci           {:mvn/version "0.8.40"}
+           datascript/datascript      {:mvn/version "1.5.4"}
+           reagent/reagent            {:mvn/version "1.2.0"}
+           babashka/sci-configs       {:git/url "https://github.com/babashka/sci-configs"
+                                       :git/sha "91c8eb918c80edaa0c1440070023a05b662538aa"}
+           instaparse/instaparse      {:mvn/version "1.4.12"}
+           org.clojure/core.match     {:mvn/version "1.1.0"}
+           tonsky/rum                 {:git/url "https://github.com/tonsky/rum"
+                                       :git/sha "005a2f067178808f92dc796f2c867cc152793279"}
+           org.clojars.viesti/nrepl-cljs-sci {:mvn/version "0.0.13"}
+
+           }
  :aliases {:cljs {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.26.2"}
                                binaryage/devtools              {:mvn/version "1.0.7"}
                                cider/cider-nrepl               {:mvn/version "0.43.3"}

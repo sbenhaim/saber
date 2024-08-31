@@ -1,6 +1,0 @@
-{:main saber.core
- :target :bundle
- ;; :output-to "cljs-out/saber.js"
- :output-dir "cljs-out/"
- :optimizations :simple
- :launch-node false}

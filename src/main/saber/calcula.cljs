@@ -79,10 +79,18 @@
   (eval-expr [:binary-exp [:expr [:number "$3"]] [:binary "^"] [:expr [:number "2"]]]))
 
 
+(defmethod eval-expr :group
+  [[_group _op expr _cp]]
+  (eval-expr (second expr)))
+
+
+;; TODO: Parens?
   ;; doc = expr (<nl> expr)*
 (def grammar "
 doc = expr?
-expr = number | assignment | aggr | binary-exp | id | mathjs
+expr = number | assignment | aggr | binary-exp | id | mathjs | group
+
+group = '(' expr ')'
 
 assignment = id '=' expr
 aggr = 'sum:' | 'avg:' | 'max:' | 'min:' | 'count:' | 'distinct:' | 'prev:'
@@ -101,7 +109,7 @@ number = #'-?\\$?[0-9.,e]+'
 (def parser (insta/parser grammar :auto-whitespace :standard))
 
 
-(comment (parser "m: x = 5"))
+(comment (-> "5 + 5 * 5" parser (get-in [1 1]) eval-expr))
 
 
 (defn format-results

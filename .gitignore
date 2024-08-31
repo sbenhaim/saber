@@ -34,3 +34,5 @@ data.json
 /saber.js
 /main.example.ts
 /.rebel_readline_history
+/.nrepl-port
+/.dir-locals.el

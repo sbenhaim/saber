@@ -3,19 +3,24 @@
             [applied-science.js-interop :as j]))
 
 
+(declare obsidian)
+(declare ^obsidian.Plugin this)
+(declare ^obsidian.App app)
+(declare ^obsidian.Vault vault)
+(declare ^obsidian.Workspace workspace)
+(declare ^obsidian.MetadataCache md)
+
+;; (defn js-obs
+;;   "In dev mode, we set a global obsidian variable. In release, we can require it."
+;;   []
+;;   (try (js/require "obsidian")
+;;        (catch js/Error e js/obsidian)))
+
+;; (comment
+;;   (js-obs))
 
 
-(defn js-obs
-  "In dev mode, we set a global obsidian variable. In release, we can require it."
-  []
-  (try (js/require "obsidian")
-       (catch js/Error e js/obsidian)))
-
-(comment
-  (js-obs))
-
-
-(def obsidian (js-obs))
+;; (def obsidian (js-obs))
 
 
 (defn ^obsidian.Editor editor []
@@ -83,15 +88,7 @@
   (js/app.plugins.getPlugin plugin))
 
 
-(def ^obsidian.Plugin this (plugin "saber"))
 
-(def ^obsidian.App app (j/get this :app))
-
-(def ^obsidian.Vault vault (j/get app :vault))
-
-(def ^obsidian.Workspace workspace (j/get app :workspace))
-
-(def ^obsidian.MetadataCache md (j/get app :metadataCache))
 
 
 (defn define-command
@@ -132,15 +129,18 @@
   ([s] (msg s 2000))
   ;; Todo: Notice
   ([s t]
-   (let [obs (js-obs)]
-     (obs.Notice. s t))))
+   (obsidian.Notice. s t)))
 
 
 (defn render-md
   [md el ctx]
-  (let [js-obs (js-obs)]
-    (js-obs.MarkdownRenderer.renderMarkdown
-      md el "" ctx)))
+  (obsidian.MarkdownRenderer.renderMarkdown
+    md el "" ctx))
+
+;; <a data-tooltip-position="top" aria-label="Tasks/Databricks orchestration.md" data-href="Tasks/Databricks orchestration.md" href="Tasks/Databricks orchestration.md" class="internal-link data-link-icon data-link-icon-after data-link-text" target="_blank" rel="noopener" data-link-tags="" data-link-class="Track" data-link-path="Tasks/Databricks orchestration.md" style="--data-link-class: Track; --data-link-path: Tasks/Databricks orchestration.md;" fileclass-name="Track">Databricks orchestration</a>
+
+(defn internal-link [name dest]
+  [:a.internal-link {:data-href dest :href dest} name])
 
 
 (comment
@@ -236,3 +236,13 @@
 (defn read
   [tfile]
   (.read vault tfile))
+
+
+
+(defn init! [^obsidian.Plugin plugin obs]
+  (set! obsidian obs)
+  (set! this plugin)
+  (set! app (j/get this :app))
+  (set! vault (j/get app :vault))
+  (set! workspace (j/get app :workspace))
+  (set! md (j/get app :metadataCache)))

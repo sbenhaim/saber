@@ -116,7 +116,7 @@
                 completions (concat completions from-imports)
                 completions (->> (map (fn [[namespace name]]
                                         (cond-> {"candidate" (str name)}
-                                          namespace (assoc "ns" (str namespace))))
+                                         namespace (assoc "ns" (str namespace))))
                                       completions)
                                  distinct vec)]
             {"completions" completions

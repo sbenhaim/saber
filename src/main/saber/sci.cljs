@@ -6,7 +6,7 @@
    [clojure.string :as str]
    [clojure.zip]
    [portal.api]
-   [saber.dataview]
+   [saber.query]
    [saber.repl-utils :as repl-utils]
    [saber.obsidian]
    [sci.configs.cljs.test :as cljs-test-config]
@@ -18,6 +18,8 @@
    [sci.core :as sci]
    [sci.ctx-store :as store]
 
+   [instaparse.core]
+   [cljs.pprint]
    [tick.core]
    [tick.locale-en-us]
    ["@mui/x-data-grid" :as datagrid]
@@ -88,8 +90,10 @@
 (def saber-obsidian-namespace (sci/copy-ns saber.obsidian (sci/create-ns 'saber.obsidian)))
 (def tick-core-namespace (sci/copy-ns tick.core (sci/create-ns 'tick.core)))
 (def tick-en-namespace (sci/copy-ns tick.locale-en-us (sci/create-ns 'tick.locale-en-us)))
-(def saber-dataview-namespace (sci/copy-ns saber.dataview (sci/create-ns 'saber.dataview)))
+(def saber-query-namespace (sci/copy-ns saber.query (sci/create-ns 'saber.query)))
 (def datagrid-namespace (sci/copy-ns datagrid (sci/create-ns 'datagrid)))
+(def instaparse-namespace (sci/copy-ns instaparse.core (sci/create-ns 'instaparse)))
+(def pprint-namespace (sci/copy-ns cljs.pprint (sci/create-ns 'pprint)))
 
 
 (def saber-core
@@ -112,28 +116,31 @@
                              'saber.obsidian saber-obsidian-namespace
                              'tick.core      tick-core-namespace
                              'tick.locale-en-us tick-en-namespace
-                             'saber.dataview saber-dataview-namespace
+                             'saber.query saber-query-namespace
                              'datagrid datagrid-namespace
+                             'instaparse.core instaparse-namespace
+                             'clojure.pprint cljs.pprint
 
                              ;; 'rewrite-clj.zip rewrite-clj-zip-ns
                              ;; 'rewrite-clj.parser rewrite-clj-parser-ns
                              ;; 'rewrite-clj.node rewrite-clj-node-ns
 
                              }
-                :ns-aliases {'clojure.test 'cljs.test}
+                :ns-aliases {'clojure.test 'cljs.test
+                             'clojure.pprint 'cljs.pprint}
                 :js-libs    {"fs" fs}
                 :load-fn    (fn [{:keys [ns libname opts]}]
-                           (cond
-                             (symbol? libname)
-                             (source-script-by-ns libname)
-                             :else ;; (string? libname) ;; node built-in or npm library
-                             (let [mod    (require* ns libname opts)
-                                   ns-sym (symbol libname)]
-                               (sci/add-class! (store/get-ctx) ns-sym mod)
-                               (sci/add-import! (store/get-ctx) ns ns-sym
-                                                (or (:as opts)
-                                                    ns-sym))
-                               {:handled true})))}]
+                              (cond
+                                (symbol? libname)
+                                (source-script-by-ns libname)
+                                :else ;; (string? libname) ;; node built-in or npm library
+                                (let [mod    (require* ns libname opts)
+                                      ns-sym (symbol libname)]
+                                  (sci/add-class! (store/get-ctx) ns-sym mod)
+                                  (sci/add-import! (store/get-ctx) ns ns-sym
+                                                   (or (:as opts)
+                                                       ns-sym))
+                                  {:handled true})))}]
     (doto
         (sci/init config)
       (sci/merge-opts js-interop-config/config)
