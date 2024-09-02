@@ -3,23 +3,18 @@
  :deps    {funcool/promesa            {:mvn/version "11.0.678"}
            applied-science/js-interop {:mvn/version "0.4.2"}
            tick/tick                  {:mvn/version "0.7.5"}
-           djblue/portal              {:mvn/version "0.49.1"}
-           org.babashka/sci           {:mvn/version "0.8.40"}
-           datascript/datascript      {:mvn/version "1.5.4"}
+           org.babashka/sci           {:mvn/version "0.8.43"}
+           datascript/datascript      {:mvn/version "1.7.3"}
            reagent/reagent            {:mvn/version "1.2.0"}
            babashka/sci-configs       {:git/url "https://github.com/babashka/sci-configs"
-                                       :git/sha "91c8eb918c80edaa0c1440070023a05b662538aa"}
-           instaparse/instaparse      {:mvn/version "1.4.12"}
+                                       :git/sha "33575ca723f54af3e5bd5a643e51b480a157054b"}
+           instaparse/instaparse      {:mvn/version "1.5.0"}
            org.clojure/core.match     {:mvn/version "1.1.0"}
-           tonsky/rum                 {:git/url "https://github.com/tonsky/rum"
-                                       :git/sha "005a2f067178808f92dc796f2c867cc152793279"}
-           org.clojars.viesti/nrepl-cljs-sci {:mvn/version "0.0.13"}
-
-           }
- :aliases {:cljs {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.26.2"}
+           org.clojars.viesti/nrepl-cljs-sci {:mvn/version "0.0.13"}}
+ :aliases {:cljs {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.28.14"}
                                binaryage/devtools              {:mvn/version "1.0.7"}
-                               cider/cider-nrepl               {:mvn/version "0.43.3"}
-                               refactor-nrepl/refactor-nrepl   {:mvn/version "3.9.0"}
+                               cider/cider-nrepl               {:mvn/version "0.50.1"}
+                               refactor-nrepl/refactor-nrepl   {:mvn/version "3.10.0"}
                                com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
                                ;; rewrite-clj/rewrite-clj           {:mvn/version "1.1.47"}
                                }}}}

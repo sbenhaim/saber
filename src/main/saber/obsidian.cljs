@@ -238,6 +238,11 @@
   (.read vault tfile))
 
 
+(defn slurp
+  [path]
+  (-> path file read))
+
+
 
 (defn init! [^obsidian.Plugin plugin obs]
   (set! obsidian obs)

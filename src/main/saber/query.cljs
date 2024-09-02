@@ -3,8 +3,7 @@
             [applied-science.js-interop :as j]
             [clojure.string :as s]
             [clojure.pprint :refer [pprint]]
-            [datascript.core :as d]
-            [rum.core :as rum]))
+            [datascript.core :as d]))
 
 
 (def plugin (obs/plugin "dataview"))
@@ -16,8 +15,6 @@
 
 
 (comment
-  (js/console.log
-    (obs/resolve-link "Pages/Karla.md" "Journals/2024-03-22.md"))
   (js/console.log
     (get-page "Journals/2023-08-30.md")))
 
@@ -250,8 +247,6 @@
         e c)))
 
   (obs/cb-processor "saber-static" (fn [s e c] (static s e c)))
-
-  (obs/cb-processor "saber" (fn [_s e _c] (rum/mount (scratch-list db) e)))
 
 
 

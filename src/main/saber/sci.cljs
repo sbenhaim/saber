@@ -3,12 +3,11 @@
    ["fs" :as fs]
    ["module" :as module]
    ["path" :as path]
-   [clojure.string :as str]
+   ["mathjs" :as mathjs]
    [clojure.zip]
-   [portal.api]
+   [promesa.core :as p]
    [saber.query]
-   [saber.repl-utils :as repl-utils]
-   [saber.obsidian]
+   [saber.obsidian :as obs]
    [sci.configs.cljs.test :as cljs-test-config]
    [sci.configs.cljs.pprint :as cljs-pprint-config]
    [sci.configs.funcool.promesa :as promesa-config]
@@ -16,131 +15,54 @@
    [sci.configs.tonsky.datascript :as datascript-config]
    [sci.configs.reagent.reagent :as reagent-config]
    [sci.core :as sci]
+   [sci.async :as scia]
    [sci.ctx-store :as store]
 
    [instaparse.core]
    [cljs.pprint]
    [tick.core]
    [tick.locale-en-us]
-   ["@mui/x-data-grid" :as datagrid]
 
-   ;; [rewrite-clj.node]
-   ;; [rewrite-clj.parser]
-   ;; [rewrite-clj.zip]
    ))
 
 (sci/enable-unrestricted-access!) ;; allows mutating and set!-ing all vars from inside SCI
 (sci/alter-var-root sci/print-fn (constantly *print-fn*))
 (sci/alter-var-root sci/print-err-fn (constantly *print-err-fn*))
 
-(def saber-ns (sci/create-ns 'saber.core nil))
-
-(defn ns->path [namespace]
-  (-> (str namespace)
-      (munge)
-      (str/replace  "." "/")
-      (str ".cljs")))
-
-(defn source-script-by-ns [namespace]
-  (let [ns-path (ns->path namespace)
-        path-if-exists (fn [search-path]
-                         (let [file-path (path/join search-path ns-path)]
-                           (when (fs/existsSync file-path)
-                             file-path)))
-        ;; workspace first, then user - the and is a nil check for no workspace
-        path-to-load (first (keep #(and % (path-if-exists %))
-                                  ["."]
-                                  #_[(conf/workspace-abs-src-path)
-                                   (conf/workspace-abs-scripts-path)
-                                   (conf/user-abs-src-path)
-                                   (conf/user-abs-scripts-path)]))]
-    (when path-to-load
-      {:file ns-path
-       :path-to-load path-to-load
-       :source (str (fs/readFileSync path-to-load))})))
+(defn load-fn
+  [{:keys [namespace ctx] :as args}]
+  (p/let [file (str "Saber/" namespace ".cljs")
+          source (obs/slurp file)]
+    (sci/eval-string* ctx source)
+    {}))
 
 
-(defn require* [from-ns lib {:keys [reload]}]
-  (let [from-path (if (.startsWith lib "/")
-                    ""
-                    (:path-to-load (source-script-by-ns from-ns)))
-        req (module/createRequire (path/resolve (or from-path "./script.cljs")))
-        resolved (.resolve req lib)]
-    (when reload
-      (aset (.-cache req) resolved js/undefined))
-    (js/require resolved)))
-
-
-(def zns (sci/create-ns 'clojure.zip nil))
-
-(def zip-namespace
-  (sci/copy-ns clojure.zip zns))
-
-;; (def rzns (sci/create-ns 'rewrite-clj.zip))
-;; (def rewrite-clj-zip-ns (sci/copy-ns rewrite-clj.zip rzns))
-
-;; (def rpns (sci/create-ns 'rewrite-clj.parser))
-;; (def rewrite-clj-parser-ns (sci/copy-ns rewrite-clj.parser rpns))
-
-;; (def rnns (sci/create-ns 'rewrite-clj.node))
-;; (def rewrite-clj-node-ns (sci/copy-ns rewrite-clj.node rnns))
-
+(def zip-namespace (sci/copy-ns clojure.zip (sci/create-ns 'clojure.zip)))
 (def core-namespace (sci/create-ns 'clojure.core nil))
-(def portal-namespace (sci/copy-ns portal.api (sci/create-ns 'portal.api)))
 (def saber-obsidian-namespace (sci/copy-ns saber.obsidian (sci/create-ns 'saber.obsidian)))
 (def tick-core-namespace (sci/copy-ns tick.core (sci/create-ns 'tick.core)))
 (def tick-en-namespace (sci/copy-ns tick.locale-en-us (sci/create-ns 'tick.locale-en-us)))
 (def saber-query-namespace (sci/copy-ns saber.query (sci/create-ns 'saber.query)))
-(def datagrid-namespace (sci/copy-ns datagrid (sci/create-ns 'datagrid)))
 (def instaparse-namespace (sci/copy-ns instaparse.core (sci/create-ns 'instaparse)))
 (def pprint-namespace (sci/copy-ns cljs.pprint (sci/create-ns 'pprint)))
-
-
-(def saber-core
-  {'*file* sci/file
-   ;; 'extension-context (sci/copy-var db/extension-context joyride-ns)
-   ;; 'invoked-script (sci/copy-var db/invoked-script joyride-ns)
-   ;; 'output-channel (sci/copy-var db/output-channel joyride-ns)
-   'js-properties repl-utils/instance-properties})
-
 
 (defn get-ctx
   []
   (let [config {:classes    {'js    (doto goog/global
                                    (aset "require" js/require))
                              :allow :all}
-                :namespaces {'clojure.core   {'IFn (sci/copy-var IFn core-namespace)}
-                             'clojure.zip    zip-namespace
-                             'saber.core     saber-core
-                             'portal.api     portal-namespace
-                             'saber.obsidian saber-obsidian-namespace
-                             'tick.core      tick-core-namespace
+                :namespaces {'clojure.core      {'IFn (sci/copy-var IFn core-namespace)}
+                             'clojure.zip       zip-namespace
+                             'saber.obsidian    saber-obsidian-namespace
+                             'tick.core         tick-core-namespace
                              'tick.locale-en-us tick-en-namespace
-                             'saber.query saber-query-namespace
-                             'datagrid datagrid-namespace
-                             'instaparse.core instaparse-namespace
-                             'clojure.pprint cljs.pprint
-
-                             ;; 'rewrite-clj.zip rewrite-clj-zip-ns
-                             ;; 'rewrite-clj.parser rewrite-clj-parser-ns
-                             ;; 'rewrite-clj.node rewrite-clj-node-ns
-
-                             }
-                :ns-aliases {'clojure.test 'cljs.test
+                             'saber.query       saber-query-namespace
+                             'instaparse.core   instaparse-namespace
+                             'clojure.pprint    cljs.pprint}
+                :ns-aliases {'clojure.test   'cljs.test
                              'clojure.pprint 'cljs.pprint}
-                :js-libs    {"fs" fs}
-                :load-fn    (fn [{:keys [ns libname opts]}]
-                              (cond
-                                (symbol? libname)
-                                (source-script-by-ns libname)
-                                :else ;; (string? libname) ;; node built-in or npm library
-                                (let [mod    (require* ns libname opts)
-                                      ns-sym (symbol libname)]
-                                  (sci/add-class! (store/get-ctx) ns-sym mod)
-                                  (sci/add-import! (store/get-ctx) ns ns-sym
-                                                   (or (:as opts)
-                                                       ns-sym))
-                                  {:handled true})))}]
+                :js-libs    {"fs" fs "mathjs" mathjs}
+                :load-fn    load-fn}]
     (doto
         (sci/init config)
       (sci/merge-opts js-interop-config/config)
@@ -151,19 +73,49 @@
       (sci/merge-opts reagent-config/config))))
 
 
-(store/reset-ctx!
-  (get-ctx))
+
+(comment (store/reset-ctx! (get-ctx)))
+
+;; (def !last-ns (volatile! @sci/ns))
+
+;; (defn eval-string [s]
+;;   (sci/binding [sci/ns @!last-ns]
+;;     (let [rdr (sci/reader s)]
+;;       (loop [res nil]
+;;         (let [form (sci/parse-next (store/get-ctx) rdr)]
+;;           (if (= :sci.core/eof form)
+;;             (do
+;;               (vreset! !last-ns @sci/ns)
+;;               res)
+;;             (recur (sci/eval-form (store/get-ctx) form))))))))
 
 
-(def !last-ns (volatile! @sci/ns))
+(defn eval-string
+  [s]
+  (scia/eval-string* (store/get-ctx) s))
 
-(defn eval-string [s]
-  (sci/binding [sci/ns @!last-ns]
-    (let [rdr (sci/reader s)]
-      (loop [res nil]
-        (let [form (sci/parse-next (store/get-ctx) rdr)]
-          (if (= :sci.core/eof form)
-            (do
-              (vreset! !last-ns @sci/ns)
-              res)
-            (recur (sci/eval-form (store/get-ctx) form))))))))
+
+(comment
+  (p/let [res (eval-string "(require '[calcula :as c]) c/parser")]
+    (println res)))
+
+
+
+(defn saber-load-file
+  [path]
+  (sci/with-bindings
+    {sci/ns   @sci/ns
+     sci/file path}
+    (p/let [code (obs/slurp path)]
+      (try
+        (eval-string code)
+        (catch js/Error e
+          (obs/msg (str "Error loading " path ": " e))
+          (println "Error loading " path ": " e))))))
+
+
+
+(defn init
+  []
+  (store/reset-ctx!
+    (get-ctx)))
