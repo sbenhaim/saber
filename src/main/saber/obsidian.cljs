@@ -1,6 +1,7 @@
 (ns saber.obsidian
   (:require [clojure.string :as s]
-            [applied-science.js-interop :as j]))
+            [applied-science.js-interop :as j]
+            [promesa.core :as p]))
 
 
 (declare obsidian)
@@ -143,6 +144,10 @@
   [:a.internal-link {:data-href dest :href dest} name])
 
 
+(defn md-link [dest alias]
+  (str "[["dest "|" alias "]]"))
+
+
 (comment
   (msg "Hello, world!")
   (msg "Hello, world!" 5000))
@@ -237,6 +242,11 @@
   [tfile]
   (.read vault tfile))
 
+(comment
+  (p/let [f (file "Saber/calcula.cljs")
+          source (read f)]
+   @source))
+
 
 (defn slurp
   [path]
@@ -245,6 +255,7 @@
 
 
 (defn init! [^obsidian.Plugin plugin obs]
+  ;; TODO: These should be getter fns?
   (set! obsidian obs)
   (set! this plugin)
   (set! app (j/get this :app))

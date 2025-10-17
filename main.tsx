@@ -1,5 +1,5 @@
 import { Plugin, App, PluginSettingTab, Setting } from "obsidian";
-// import { main } from "cljs-out/saber.js";
+import { main } from "cljs-out/saber.js";
 
 
 interface SaberSettings {
@@ -25,7 +25,7 @@ export default class Saber extends Plugin {
 
     // For dev
     // @ts-ignore:
-    let { main } = await import("http://localhost:8605/saber.js");
+    // let { main } = await import("http://localhost:8605/saber.js");
     main(this, require("obsidian"));
 
 

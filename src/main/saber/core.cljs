@@ -4,7 +4,7 @@
    [nrepl-cljs-sci.core :as nrepl]
    [reagent.dom :as rdom]
    [saber.obsidian :as obs]
-   [saber.query :as q]
+   ;; [saber.query :as q]
    [sci.ctx-store :as store]
    [saber.sci :as sci]
    [promesa.core :as p]))
@@ -20,6 +20,7 @@
 (defn start-nrepl
   [port]
   (let [opts {:port port
+              :app js/app
               :host "127.0.0.1"
               :ctx (store/get-ctx)}]
     (nrepl/start-server opts)
@@ -56,7 +57,7 @@
 
   (sci/init)
   (obs/init! plugin obsidian)
-  (q/init)
+  ;; (q/init)
 
   ;; Command to start nREPL
   (obs/define-command

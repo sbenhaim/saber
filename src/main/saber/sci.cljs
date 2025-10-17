@@ -5,6 +5,7 @@
    ["path" :as path]
    ["mathjs" :as mathjs]
    [clojure.zip]
+   [clojure.string :as str]
    [promesa.core :as p]
    [saber.query]
    [saber.obsidian :as obs]
@@ -31,7 +32,9 @@
 
 (defn load-fn
   [{:keys [namespace ctx] :as args}]
-  (p/let [file (str "Saber/" namespace ".cljs")
+  (p/let [path (str/replace namespace "." "/")
+          path (str/replace path "-" "_")
+          file (str "Saber/" path ".cljs")
           source (obs/slurp file)]
     (sci/eval-string* ctx source)
     {}))

@@ -34,6 +34,7 @@
 		"mathjs": "^12.3.2",
 		"nrepl-cljs-sci": "^0.0.13",
 		"obsidian": "^1.4.11",
+		"open": "^10.1.0",
 		"punycode": "2.1.1",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
