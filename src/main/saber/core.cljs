@@ -4,7 +4,6 @@
    [nrepl-cljs-sci.core :as nrepl]
    [reagent.dom :as rdom]
    [saber.obsidian :as obs]
-   ;; [saber.query :as q]
    [sci.ctx-store :as store]
    [saber.sci :as sci]
    [promesa.core :as p]))
@@ -57,7 +56,6 @@
 
   (sci/init)
   (obs/init! plugin obsidian)
-  ;; (q/init)
 
   ;; Command to start nREPL
   (obs/define-command

@@ -1,7 +1,5 @@
 (ns saber.utils
-  (:require [clojure.pprint :as pprint]
-            [clojure.string :as str]
-            [promesa.core :as p]))
+  (:require [clojure.string :as str]))
 
 (defn jsify [clj-thing]
   (clj->js clj-thing))
