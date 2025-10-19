@@ -7,7 +7,6 @@
    [clojure.zip]
    [clojure.string :as str]
    [promesa.core :as p]
-   [saber.query]
    [saber.obsidian :as obs]
    [sci.configs.cljs.test :as cljs-test-config]
    [sci.configs.cljs.pprint :as cljs-pprint-config]
@@ -45,7 +44,6 @@
 (def saber-obsidian-namespace (sci/copy-ns saber.obsidian (sci/create-ns 'saber.obsidian)))
 (def tick-core-namespace (sci/copy-ns tick.core (sci/create-ns 'tick.core)))
 (def tick-en-namespace (sci/copy-ns tick.locale-en-us (sci/create-ns 'tick.locale-en-us)))
-(def saber-query-namespace (sci/copy-ns saber.query (sci/create-ns 'saber.query)))
 (def instaparse-namespace (sci/copy-ns instaparse.core (sci/create-ns 'instaparse)))
 (def pprint-namespace (sci/copy-ns cljs.pprint (sci/create-ns 'pprint)))
 
@@ -59,7 +57,6 @@
                              'saber.obsidian    saber-obsidian-namespace
                              'tick.core         tick-core-namespace
                              'tick.locale-en-us tick-en-namespace
-                             'saber.query       saber-query-namespace
                              'instaparse.core   instaparse-namespace
                              'clojure.pprint    cljs.pprint}
                 :ns-aliases {'clojure.test   'cljs.test

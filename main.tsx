@@ -83,8 +83,7 @@ class SaberSettingTab extends PluginSettingTab {
           .onChange(async (value:string) => {
             this.plugin.settings.replPort = value;
             await this.plugin.saveSettings();
-          }
-                   )
+          })
       });
   }
 }

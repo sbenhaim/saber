@@ -4,7 +4,8 @@
             [promesa.core :as p]))
 
 
-(declare obsidian)
+(def obsidian (js/require "obsidian"))
+
 (declare ^obsidian.Plugin this)
 (declare ^obsidian.App app)
 (declare ^obsidian.Vault vault)
